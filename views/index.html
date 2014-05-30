@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+     <link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="/javascripts/jquery-2.1.0.js"></script>
+    <script type="text/javascript" src="/javascripts/earthquakes-ui.js"></script>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true"></script>
+    <script type="text/javascript">
+        function initMap() {
+            var mapOptions = {
+                center: new google.maps.LatLng(39.601994, -97.042971),
+                zoom: 3,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map1 = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+            var currentTime = new Date();
+            document.getElementById("inputOn").value = currentTime.getTime()/1000;
+            var data = $('#formGetEarthquakeInfo').serialize();
+            $.ajax(
+                { url: '/earthquakes.json/',
+                  type: 'GET',
+                  data: data,
+                  success: renderGetEarthquakeInfoMap
+                }
+            );
+         }
+    </script>
+    <style type="text/css">
+        body {
+            font-family: 'Droid Serif', 'Helvetica';
+            color: #000000;
+        }
+        .inputtext {
+            font-family: 'Droid Serif', 'Helvetica';
+            color: #000000;
+            height: 50px;
+            width: 100px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+  </head>
+<body onload="initMap()">
+      <h2>Real-time Earthquake Data!</h2>
+      <div id="controls">
+        <h2>Map earthquake data based on time of occurrence, GPS location, and/or magnitude: </h2>
+        <div id="inputtext">
+            <form id="formGetEarthquakeInfo" name="getearthquakeinfo" method="get" action="/earthquakes.json">
+                <input id="inputOn" type="text" placeholder="on (UTC in sec)" name="on"/>
+                <input id="inputSince" type="text" placeholder="since (UTC in sec)" name="since" value="1400915894"/>
+                <input id="inputOver" type="text" placeholder="over (i.e. 3.2)" name="over" value="4.2"/>
+                <input id="inputNearLat" type="text" placeholder="near LATITUDE" name="nearLat"/>
+                <input id="inputNearLong" type="text" placeholder="near LONGITUDE" name="nearLong"/>
+                <input id="inputRadius" type="text" placeholder="radius (default: 5 miles)" name="radius" style="width:200px"/>
+                <button id="getearthquakeinfo" type="button">GO!</button>
+            </form>
+        </div>
+        <h1></h1>
+        <div id="map_canvas" style="width:1100px; height:600px">
+        </div>
+        <h1></h1>
+        <a id="debug_link" href="#">Debug</a>
+        <div id="debug" class="hidden">
+          <h2>Force a data fetch from USGS for a selected time period.</h2>
+          <form id="formDownloadEarthquakeInfo" name="downloadearthquakeinfo" method="post" action="/download">
+            <select id="inputDownloadTimeRange" name="downloadtimerange" style="width:400px">
+              <option value="hour">Hour</option>
+              <option value="day">Day</option>
+              <option value="week">Week (7 Days)</option>
+              <option value="month">Month (30 Days)</option>
+            </select>
+            <button id="download" type="button">GO!</button>
+          </form>
+        </div>
+      </div>
+      <h1></h1>
+  </body>
+</html>
